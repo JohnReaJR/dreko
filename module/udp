@@ -840,10 +840,10 @@ menu_udp_custom() {
 
 # [MAIN MENU]A
 menu_main() {
-  # title "\033[3;40m${a10:-• HTTP CUSTOM UDP} •"
-  main_title "\033[3;40m${a10:-• HTTP CUSTOM UDP} •"
-  print_center -ama 'Version:⇢3.0'
-  print_center -ama 'Resleeved Net'
+  # title "\033[3;40m${a10:-• UDP Custom | UDP Request Manager} •"
+  main_title "\033[3;40m${a10:-• UDP Custom Manager} •"
+  print_center -ama 'Version: ⇢ 3.0'
+  print_center -ama 'by InFiNitY'
   msg -bar
 
   # calculate RAM and CPU usage
