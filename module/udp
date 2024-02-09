@@ -771,8 +771,8 @@ vps_info() {
   ram=$(free -m | awk 'NR==2{printf "%.2f%%", $3*100/$2 }')
 
   clear
-  title_sub "\033[3;40m${a10:-•UDP Custom Manager} by InFiNitY"
-  print_center -ama ' Version: ⇢ 3.0'
+  title_sub "\033[3;40m${a10:-•HTTP CUSTOM UDP} Resleeved"
+  print_center -ama ' Version:⇢3.0'
   print_center -ama ' VPS Info'
   msg -bar
   echo " "
@@ -793,11 +793,11 @@ vps_info() {
 
 # [UDP - Custom]
 menu_udp_custom() {
-  # title "\033[3;40m${a10:-•UDP Custom | UDP Request Manager} by InFiNitY"
-  title_sub "\033[3;40m${a10:-•UDP Custom Manager} by InFiNitY"
-  print_center -ama ' Version: 3.0'
-  print_center -ama ' UDP CUSTOM'
-  print_center -ama ' Tunnel App : HTTP Custom'
+  # title "\033[3;40m${a10:-•HTTP CUSTOM UDP} Resleeved"
+  title_sub "\033[3;40m${a10:-•HTTP CUSTOM UDP} Resleeved"
+  print_center -ama ' Version:3.0'
+  print_center -ama ' HTTP CUSTOM UDP'
+  print_center -ama ' Client : HTTP CUSTOM 
   msg -bar
 
   ram=$(printf '%-8s' "$(free -m | awk 'NR==2{printf "%.2f%%", $3*100/$2 }')")
