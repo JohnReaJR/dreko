@@ -1,6 +1,6 @@
 #!/bin/bash
 #Version : ⇢ 3.0
-udp_dir='/etc/UDPCustom'
+udp_dir='/root/udp'
 source $udp_dir/module
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -21,7 +21,7 @@ limiter() {
     for i in $(atq | awk '{print $1}'); do
       if [[ ! $(at -c $i | grep '/etc/limiter.sh') = "" ]]; then
         atrm $i
-        sed -i '/etc/limiter.sh/d' /var/spool/cron/crontabs/root
+        sed -i '/root/udp/limiter.sh/d' /var/spool/cron/crontabs/root
         print_center -verd "Limiter stopped"
         enter
         return
@@ -110,14 +110,14 @@ limiter() {
     msg -bar
     print_center -ama "${a84:-LIMITER REGISTRY}"
     msg -bar
-    [[ ! -e /etc/limit.log ]] && touch /etc/limit.log
-    if [[ -z $(cat /etc/limit.log) ]]; then
+    [[ ! -e /root/udp/limit.log ]] && touch /etc/limit.log
+    if [[ -z $(cat /root/udp/limit.log) ]]; then
       print_center -ama "${a85:-no account limiter record}"
       msg -bar
       sleep 2
       return
     fi
-    msg -teal "$(cat /etc/limit.log)"
+    msg -teal "$(cat /root/udp/limit.log)"
     msg -bar
     print_center -ama "►► ${a86:-Press enter to continue...} ◄◄"
     print_center -ama "►► ${a87:-0 to clear record} ◄◄"
