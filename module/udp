@@ -805,7 +805,7 @@ menu_udp_custom() {
   echo " $(msg -verd ' ⇢  IP:') $(msg -azu "$request_public_ip")  $(msg -verd 'Ram:') $(msg -azu "$ram") $(msg -verd 'CPU:') $(msg -azu "$cpu")"
   msg -bar
 
-  if [[ $(systemctl is-active udp-custom) = 'active' ]]; then
+  if [[ $(systemctl is-active custom-server.service) = 'active' ]]; then
     state="\e[1m\e[32m[ON]"
   else
     state="\e[1m\e[31m[OFF]"
