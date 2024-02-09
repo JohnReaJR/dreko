@@ -35,7 +35,7 @@ droppids(){
 
 sshmonitor(){
   h=1
-  unlimit=$(cat /etc/unlimit)
+  unlimit=$(cat /root/udp/unlimit)
     for i in `print_center -ama "$user_type"`; do
 
         user="$i"
@@ -68,15 +68,15 @@ sshmonitor(){
         	droplim=`droppids|grep -w "$user"|awk '{print $2}'` 
         	kill -9 $droplim &>/dev/null
         	usermod -L $user
-        	print_center -ama "$user $(printf '%(%H:%M:%S)T') $conex/$s2ssh" >> /etc/limit.log
+        	print_center -ama "$user $(printf '%(%H:%M:%S)T') $conex/$s2ssh" >> /root/udp/limit.log
           [[ $unlimit -le 0 ]] && continue || at now +${unlimit} minutes <<< "usermod -U $user" &>/dev/null
         fi
       done
-      touch /etc/limit
-      timer=$(cat /etc/limit)
+      touch /root/udp/limit
+      timer=$(cat /root/udp/limit)
       [[ -z ${timer} ]] && timer="3"
-      at now +${timer} minutes <<< "/etc/limiter.sh" &>/dev/null
-      [[ -z $(cat "/var/spool/cron/crontabs/root"|grep "limiter.sh") ]] && print_center -ama "@reboot root /etc/limiter.sh" >> /var/spool/cron/crontabs/root
+      at now +${timer} minutes <<< "/root/udp/limiter.sh" &>/dev/null
+      [[ -z $(cat "/var/spool/cron/crontabs/root"|grep "limiter.sh") ]] && print_center -ama "@reboot root /root/udp/limiter.sh" >> /var/spool/cron/crontabs/root
 }
 
 expired(){
@@ -85,7 +85,7 @@ expired(){
       if [[ $(date '+%s') -gt $(date '+%s' -d "$userDate") ]]; then
         if [[ $(passwd --status $line|cut -d ' ' -f2) = "P" ]]; then  
           usermod -L $line
-          print_center -ama "$line $(printf '%(%H:%M:%S)T') expired" >> /etc/limit.log
+          print_center -ama "$line $(printf '%(%H:%M:%S)T') expired" >> /root/udp/limit.log
         fi    
       fi
     done <<< $(print_center -ama "$user_type")
