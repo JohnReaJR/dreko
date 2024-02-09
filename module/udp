@@ -110,7 +110,7 @@ limiter() {
     msg -bar
     print_center -ama "${a84:-LIMITER REGISTRY}"
     msg -bar
-    [[ ! -e /root/udp/limit.log ]] && touch /etc/limit.log
+    [[ ! -e /root/udp/limit.log ]] && touch /root/udp/limit.log
     if [[ -z $(cat /root/udp/limit.log) ]]; then
       print_center -ama "${a85:-no account limiter record}"
       msg -bar
@@ -122,7 +122,7 @@ limiter() {
     print_center -ama "►► ${a86:-Press enter to continue...} ◄◄"
     print_center -ama "►► ${a87:-0 to clear record} ◄◄"
     read option
-    [[ $option = "0" ]] && print_center -ama "" >/etc/limit.log
+    [[ $option = "0" ]] && print_center -ama "" >/root/udp/limit.log
   }
 
   [[ $(cat /var/spool/cron/crontabs/root | grep -w 'limiter.sh' | grep -w 'ssh') ]] && lim_e=$(msg -verd "[ON]") || lim_e=$(msg -verm2 "[OFF]")
