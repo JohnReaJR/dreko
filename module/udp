@@ -545,9 +545,8 @@ uninstall_udp_manager() {
   systemctl disable custom-server.service &>/dev/null
   rm -rf /etc/systemd/system/custom-server.service
   rm -rf /root/udp
-  rm -rf /usr/bin/udpgw
   rm -rf /etc/systemd/system/udpgw.service
-  systemctl stop udpgw &>/dev/null
+  systemctl stop udpgw-server.service &>/dev/null
   del 1
   print_center -ama "${a34:-Uninstallation completed!}"
   enter
@@ -560,7 +559,7 @@ reset_udp_custom() {
     systemctl disable custom-server.service &>/dev/null
     print_center -ama "${a35:-UDP-Custom reset done!}"
   else
-    systemctl start udp-custom &>/dev/null
+    systemctl start custom-server.service &>/dev/null
     if [[ $(systemctl is-active custom-server.service) = 'active' ]]; then
       systemctl enable custom-server.service &>/dev/null
       print_center -verd "${a36:-UDP-Custom started!}"
@@ -652,8 +651,8 @@ add_exclude() {
       sed -i "s/-exclude=$exclude_port/$Port/" /etc/systemd/system/custom-server.service
     fi
     if [[ $iniciar = 1 ]]; then
-      systemctl start udp-request &>/dev/null
-      systemctl enable udp-request &>/dev/null
+      systemctl start custom-server.service &>/dev/null
+      systemctl enable custom-server.service &>/dev/null
     fi
   fi
   enter
@@ -700,7 +699,7 @@ quit_exclude() {
   fi
   if [[ $iniciar = 1 ]]; then
     systemctl start custom-server.service &>/dev/null
-    systemctl enable hysteria-server.service &>/dev/null
+    systemctl enable custom-server.service &>/dev/null
   fi
   enter
 }
