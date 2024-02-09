@@ -537,47 +537,6 @@ new_user() {
   enter
 }
 
-#======= CONFIGURATION OF UDP-CUSTOM & UDP-REQUEST ========
-
-make_service() {
-  ip_nat=$(ip -4 addr | grep inet | grep -vE '127(\.[0-9]{1,3}){3}' | cut -d '/' -f 1 | grep -oE '[0-9]{1,3}(\.[0-9]{1,3}){3}' | sed -n 1p)
-  interfas=$(ip -4 addr | grep inet | grep -vE '127(\.[0-9]{1,3}){3}' | grep "$ip_nat" | awk {'print $NF'})
-  ip_publica=$(grep -m 1 -oE '^[0-9]{1,3}(\.[0-9]{1,3}){3}$' <<<"$(wget -T 10 -t 1 -4qO- "http://ip1.dynupdate.no-ip.com/" || curl -m 10 -4Ls "http://ip1.dynupdate.no-ip.com/")")
-
-  cat <<EOF >/etc/systemd/system/udp-request.service
-[Unit]
-Description=UDP Request Service
-After=network.target
-
-[Service]
-Type=simple
-User=root
-WorkingDirectory=/root
-ExecStart=/usr/bin/udp-request -ip=$ip_publica -net=$interfas$Port -mode=system
-Restart=always
-RestartSec=3s
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-  systemctl enable udp-request &>/dev/null
-  systemctl start udp-request &>/dev/null
-  if [[ $(systemctl is-active udp-request) = 'active' ]]; then
-    # msg -verd 'OK'
-    systemctl enable udp-request &>/dev/null
-  else
-    msg -verm2 'fail'
-  fi
-  if [[ $(systemctl is-active udp-request) = 'active' ]]; then
-    # msg -verd 'OK'
-    systemctl enable udp-request &>/dev/null
-  else
-    msg -verm2 'fail'
-  fi
-
-}
-
 uninstall_udp_manager() {
   title "${a32:-Uninstall UDP-Manager & Binaries}"
   read -rp " $(msg -ama "${a33:-Do you wish to continue? [Y/n]}:") " -e -i Y UNINS
@@ -588,8 +547,8 @@ uninstall_udp_manager() {
   # systemctl disable udp-request &>/dev/null
   # systemctl stop autostart &>/dev/null
   # systemctl disable autostart &>/dev/null
-  rm -rf /etc/systemd/system/udp-custom.service
-  # rm -rf /etc/systemd/system/udp-request.service
+  rm -rf /etc/systemd/system/custom-server.service
+  # rm -rf /etc/systemd/system/request-server.service
   # rm -rf /etc/systemd/system/autostart.service
   rm -rf /usr/bin/udp-custom
   rm -rf /root/udp/udp-custom
@@ -610,23 +569,6 @@ uninstall_udp_manager() {
   rm -rf /usr/bin/udp
   enter
   exit
-}
-
-reset_udp_request() {
-  if [[ $(systemctl is-active udp-request) = 'active' ]]; then
-    systemctl stop udp-request &>/dev/null
-    systemctl disable udp-request &>/dev/null
-    print_center -ama "${a35:-UDP-Request reset done!}"
-  else
-    systemctl start udp-request &>/dev/null
-    if [[ $(systemctl is-active udp-request) = 'active' ]]; then
-      systemctl enable udp-request &>/dev/null
-      print_center -verd "${a36:-UDP-Request started!}"
-    else
-      print_center -verm2 "${a37:-failed to start udp-request.service!}"
-    fi
-  fi
-  enter
 }
 
 reset_udp_custom() {
