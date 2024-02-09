@@ -541,45 +541,28 @@ uninstall_udp_manager() {
   title "${a32:-Uninstall UDP-Manager & Binaries}"
   read -rp " $(msg -ama "${a33:-Do you wish to continue? [Y/n]}:") " -e -i Y UNINS
   [[ $UNINS != @(Y|y|S|s) ]] && return
-  systemctl stop udp-custom &>/dev/null
-  systemctl disable udp-custom &>/dev/null
-  # systemctl stop udp-request &>/dev/null
-  # systemctl disable udp-request &>/dev/null
-  # systemctl stop autostart &>/dev/null
-  # systemctl disable autostart &>/dev/null
+  systemctl stop custom-server.service &>/dev/null
+  systemctl disable custom-server.service &>/dev/null
   rm -rf /etc/systemd/system/custom-server.service
-  # rm -rf /etc/systemd/system/request-server.service
-  # rm -rf /etc/systemd/system/autostart.service
-  rm -rf /usr/bin/udp-custom
-  rm -rf /root/udp/udp-custom
-  # rm -rf /root/udp/udp-request
-  # rm -rf /usr/bin/udp-request
-  rm -rf /root/udp/config.json
-  rm -rf /etc/UDPCustom/udp-custom
-  # rm -rf /usr/bin/udp-request
-  # rm -rf /etc/UDPCustom/autostart.service
-  # rm -rf /etc/UDPCustom/autostart
-  # rm -rf /etc/autostart.service
-  # rm -rf /etc/autostart
+  rm -rf /root/udp
   rm -rf /usr/bin/udpgw
   rm -rf /etc/systemd/system/udpgw.service
   systemctl stop udpgw &>/dev/null
   del 1
   print_center -ama "${a34:-Uninstallation completed!}"
-  rm -rf /usr/bin/udp
   enter
   exit
 }
 
 reset_udp_custom() {
   if [[ $(systemctl is-active udp-custom) = 'active' ]]; then
-    systemctl stop udp-custom &>/dev/null
-    systemctl disable udp-custom &>/dev/null
+    systemctl stop custom-server.service &>/dev/null
+    systemctl disable custom-server.service &>/dev/null
     print_center -ama "${a35:-UDP-Custom reset done!}"
   else
     systemctl start udp-custom &>/dev/null
-    if [[ $(systemctl is-active udp-custom) = 'active' ]]; then
-      systemctl enable udp-custom &>/dev/null
+    if [[ $(systemctl is-active custom-server.service) = 'active' ]]; then
+      systemctl enable custom-server.service &>/dev/null
       print_center -verd "${a36:-UDP-Custom started!}"
     else
       print_center -verm2 "${a37:-failed to start udp-custom.service!}"
