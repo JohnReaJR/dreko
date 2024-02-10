@@ -877,9 +877,9 @@ menu_main() {
   # 2)
   #   menu_udp_request
   #   ;;
-  3)
-    tweak_udp_speed
-    ;;
+  # 3)
+  #   tweak_udp_speed
+  #   ;;
   4)
     vps_info
     ;;
