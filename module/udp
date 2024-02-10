@@ -545,8 +545,9 @@ uninstall_udp_manager() {
   systemctl disable custom-server.service &>/dev/null
   rm -rf /etc/systemd/system/custom-server.service
   rm -rf /root/udp
+  systemctl stop udpgw.service &>/dev/null
   rm -rf /etc/systemd/system/udpgw.service
-  systemctl stop udpgw-server.service &>/dev/null
+  rm -rf /usr/bin/udpgw
   del 1
   print_center -ama "${a34:-Uninstallation completed!}"
   enter
