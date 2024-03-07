@@ -1,5 +1,5 @@
 #!/bin/bash
-#Version : ⇢ 3.0
+#Release: v.5
 udp_dir='/root/udp'
 source $udp_dir/module
 
@@ -537,14 +537,15 @@ new_user() {
   enter
 }
 
-uninstall_udp_manager() {
-  title "${a32:-Uninstall UDP-Manager & Binaries}"
+Uninstall_UDP_REQUEST() {
+  title "${a32:-Uninstall UDP REQUEST}"
   read -rp " $(msg -ama "${a33:-Do you wish to continue? [Y/n]}:") " -e -i Y UNINS
   [[ $UNINS != @(Y|y|S|s) ]] && return
-  systemctl stop custom-server.service &>/dev/null
-  systemctl disable custom-server.service &>/dev/null
-  rm -rf /etc/systemd/system/custom-server.service
+  systemctl stop request-server.service &>/dev/null
+  systemctl disable request-server.service &>/dev/null
+  rm -rf /etc/systemd/system/request-server.service
   rm -rf /root/udp
+  rm -rf /usr/bin/udp
   systemctl stop udpgw.service &>/dev/null
   rm -rf /etc/systemd/system/udpgw.service
   rm -rf /usr/bin/udpgw
@@ -554,19 +555,19 @@ uninstall_udp_manager() {
   exit
 }
 
-reset_udp_custom() {
-  if [[ $(systemctl is-active custom-server.service) = 'active' ]]; then
-    systemctl stop custom-server.service &>/dev/null
-    systemctl disable custom-server.service &>/dev/null
-    print_center -ama "${a35:-UDP-Custom reset done!}"
+reset_udp_request() {
+  if [[ $(systemctl is-active request-server.service) = 'active' ]]; then
+    systemctl stop request-server.service &>/dev/null
+    systemctl disable request-server.service &>/dev/null
+    print_center -ama "${a35:-UDP REQUEST Reset Done!}"
   else
-    systemctl start custom-server.service &>/dev/null
-    if [[ $(systemctl is-active custom-server.service) = 'active' ]]; then
-      systemctl enable custom-server.service &>/dev/null
-      systemctl start custom-server.service &>/dev/null
-      print_center -verd "${a36:-UDP-Custom started!}"
+    systemctl start request-server.service &>/dev/null
+    if [[ $(systemctl is-active request-server.service) = 'active' ]]; then
+      systemctl enable request-server.service &>/dev/null
+      systemctl start request-server.service &>/dev/null
+      print_center -verd "${a36:-UDP REQUEST Running!}"
     else
-      print_center -verm2 "${a37:-failed to start udp-custom.service!}"
+      print_center -verm2 "${a37:-failed to start request-server.service!}"
     fi
   fi
   enter
@@ -574,7 +575,7 @@ reset_udp_custom() {
 
 exclude() {
   title "${a20:-Exclude UDP ports}"
-  print_center -ama "${a21:-UDP CUSTOM covers full range of ports,}"
+  print_center -ama "${a21:-UDP REQUEST covers full range of ports,}"
   print_center -ama "${a22:-However, you can exclude UDP ports.}"
   msg -bar3
   print_center -ama "${a23:-Examples of ports you can exclude:}:"
@@ -610,7 +611,7 @@ exclude() {
 
 add_exclude() {
   title "${a20:-Exclude UDP ports}"
-  print_center -ama "${a21:-UDP-Request covers full range of ports,}"
+  print_center -ama "${a21:-UDP REQUEST covers full range of ports,}"
   print_center -ama "${a22:-However, you can exclude UDP ports.}"
   msg -bar3
   print_center -ama "${a23:-Examples of ports you can exclude:}:"
@@ -638,23 +639,23 @@ add_exclude() {
     unset Port
     print_center -ama "${a29:-no ports excluded}"
   else
-    exclude=$(cat /etc/systemd/system/custom-server.service | grep 'exclude')
-    if systemctl is-active custom-server.service &>/dev/null; then
-      systemctl stop custom-server.service &>/dev/null
-      systemctl disable custom-server.service &>/dev/null
+    exclude=$(cat /etc/systemd/system/request-server.service | grep 'exclude')
+    if systemctl is-active request-server.service &>/dev/null; then
+      systemctl stop request-server.service &>/dev/null
+      systemctl disable request-server.service &>/dev/null
       iniciar=1
     fi
     if [[ -z $exclude ]]; then
       Port=" -exclude=$(echo "$Port" | sed "s/ /,/g" | sed 's/,//')"
-      sed -i "s/ -mode/$Port -mode/" /etc/systemd/system/custom-server.service
+      sed -i "s/ -mode/$Port -mode/" /etc/systemd/system/request-server.service
     else
       exclude_port=$(echo $exclude | awk '{print $4}' | cut -d '=' -f2)
       Port="-exclude=$exclude_port$(echo "$Port" | sed "s/ /,/g")"
-      sed -i "s/-exclude=$exclude_port/$Port/" /etc/systemd/system/custom-server.service
+      sed -i "s/-exclude=$exclude_port/$Port/" /etc/systemd/system/request-server.service
     fi
     if [[ $iniciar = 1 ]]; then
-      systemctl enable custom-server.service &>/dev/null
-      systemctl start custom-server.service &>/dev/null
+      systemctl enable request-server.service &>/dev/null
+      systemctl start request-server.service &>/dev/null
     fi
   fi
   enter
@@ -662,7 +663,7 @@ add_exclude() {
 
 quit_exclude() {
   title "${a88:-REMOVE EXCLUSION PORT}"
-  exclude=$(cat /etc/systemd/system/custom-server.service | grep 'exclude' | awk '{print $4}')
+  exclude=$(cat /etc/systemd/system/request-server.service | grep 'exclude' | awk '{print $4}')
   ports=($port)
   for ((i = 0; i < ${#ports[@]}; i++)); do
     a=$(($i + 1))
@@ -680,13 +681,13 @@ quit_exclude() {
   fi
   option=$(selection_fun $a)
   [[ $option = 0 ]] && return
-  if systemctl is-active custom-server.service &>/dev/null; then
-    systemctl stop custom-server.service &>/dev/null
-    systemctl disable custom-server.service &>/dev/null
+  if systemctl is-active request-server.service &>/dev/null; then
+    systemctl stop request-server.service &>/dev/null
+    systemctl disable request-server.service &>/dev/null
     iniciar=1
   fi
   if [[ $option = $a ]]; then
-    sed -i "s/$exclude /" /etc/systemd/system/custom-server.service
+    sed -i "s/$exclude /" /etc/systemd/system/request-server.service
     print_center -ama "${a91:-Removed all excluded ports}"
   else
     let option--
@@ -697,52 +698,13 @@ quit_exclude() {
       Port+=" ${ports[$i]}"
     done
     Port=$(echo $Port | sed 's/ /,/g')
-    sed -i "s/$exclude/-exclude=$Port/" /etc/systemd/system/custom-server.service
+    sed -i "s/$exclude/-exclude=$Port/" /etc/systemd/system/request-server.service
   fi
   if [[ $iniciar = 1 ]]; then
-    systemctl enable custom-server.service &>/dev/null
-    systemctl start custom-server.service &>/dev/null
+    systemctl enable request-server.service &>/dev/null
+    systemctl start request-server.service &>/dev/null
   fi
   enter
-}
-
-# [Tweak UDP Speed]
-tweak_udp_speed() {
-  # WARNING!!!
-  clear
-  echo ""
-  msg -bar
-  echo "$(msg -verm2 "${a3:-  A RISK TO YOUR SYSTEM}")"
-  echo "$(msg -verm2 "${a8:-  ⇢ ... this may or may-not work,}")"
-  echo "$(msg -verm2 "${a8:-    depending on your OS Image!}")"
-  sleep 2
-  echo "$(msg -verm2 "${a8:-  ⇢ patching...}")"
-  sleep 2
-  # Turn off TCP Timestamps to improve UDP throughput
-  echo 0 >/proc/sys/net/ipv4/tcp_timestamps
-
-  # Increase the maximum amount of memory available for network buffers
-  echo 4194304 >/proc/sys/net/core/wmem_max
-  echo 4194304 >/proc/sys/net/core/rmem_max
-
-  # Increase the default network buffer sizes
-  echo 16384 87380 16777216 >/proc/sys/net/ipv4/tcp_wmem
-  echo 16384 87380 16777216 >/proc/sys/net/ipv4/tcp_rmem
-
-  # Increase the maximum size of the receive buffer queue
-  echo 4096 >/proc/sys/net/ipv4/tcp_max_syn_backlog
-
-  # Increase the maximum number of open files per process
-  ulimit -n 65535
-
-  # Reboot networking interface
-  sudo systemctl restart NetworkManager &>/dev/null
-
-  sleep 2
-  echo "${a6:-  ⇢ You may see network speed improvement on this Server.}"
-  echo "${a6:-  ⇢ Done!}"
-  msg -bar0
-  sleep 3
 }
 
 vps_info() {
@@ -772,8 +734,8 @@ vps_info() {
   ram=$(free -m | awk 'NR==2{printf "%.2f%%", $3*100/$2 }')
 
   clear
-  title_sub "\033[3;40m${a10:-•UDP Custom Manager} by InFiNitY"
-  print_center -ama ' Version: ⇢ 3.0'
+  title_sub "\033[3;40m${a10:-•UDP REQUEST} Resleeved Net"
+  print_center -ama ' Release: v.5'
   print_center -ama ' VPS Info'
   msg -bar
   echo " "
@@ -792,13 +754,12 @@ vps_info() {
   enter
 }
 
-# [UDP - Custom]
-menu_udp_custom() {
-  # title "\033[3;40m${a10:-•UDP Custom | UDP Request Manager} by InFiNitY"
-  title_sub "\033[3;40m${a10:-•UDP Custom Manager} by InFiNitY"
-  print_center -ama ' Version: 3.0'
-  print_center -ama ' UDP CUSTOM'
-  print_center -ama ' Tunnel App : HTTP Custom'
+# [UDP - REQUEST]
+Menu_UDP_REQUEST() {
+  title_sub "\033[3;40m${a10:-• UDP REQUEST} •"
+  print_center -ama 'Release: v.5'
+  print_center -ama 'Resleeved Net'
+  print_center -ama 'Tunnel App : SOCKSIP'
   msg -bar
 
   ram=$(printf '%-8s' "$(free -m | awk 'NR==2{printf "%.2f%%", $3*100/$2 }')")
@@ -806,16 +767,14 @@ menu_udp_custom() {
   echo " $(msg -verd ' ⇢  IP:') $(msg -azu "$request_public_ip")  $(msg -verd 'Ram:') $(msg -azu "$ram") $(msg -verd 'CPU:') $(msg -azu "$cpu")"
   msg -bar
 
-  if [[ $(systemctl is-active custom-server.service) = 'active' ]]; then
+  if [[ $(systemctl is-active request-server.service) = 'active' ]]; then
     state="\e[1m\e[32m[ON]"
   else
     state="\e[1m\e[31m[OFF]"
   fi
-  echo -e " $(msg -verd "[1]") $(msg -verm2 '>') $(msg -azu "${a2:-Activate/Deactivate UDP-Custom}") $state"
-  msg -bar0
+  print_center -ama "${a12:-Resleeved Net Menu}"
   msg -bar3
-  print_center -ama "${a12:-QUICK MENU}"
-  msg -bar3
+  echo -e " $(msg -verd "[1]") $(msg -verm2 '>') $(msg -azu "${a2:-Turn On/Off UDP}") $state"
   echo " $(msg -verd "[2]") $(msg -verm2 '>') $(msg -verd "${a6:-Create User}")"
   echo " $(msg -verd "[3]") $(msg -verm2 '>') $(msg -verm2 "${a7:-Remove User}")"
   echo " $(msg -verd "[4]") $(msg -verm2 '>') $(msg -ama "${a8:-Renew User}")"
@@ -828,7 +787,7 @@ menu_udp_custom() {
   read -p " ⇢  Enter your selection: " option
 
   case $option in
-  1) reset_udp_custom ;;
+  1) reset_udp_request ;;
   2) new_user ;;
   3) remove_user ;;
   4) renew_user ;;
@@ -841,10 +800,9 @@ menu_udp_custom() {
 
 # [MAIN MENU]A
 menu_main() {
-  # title "\033[3;40m${a10:-• UDP Custom | UDP Request Manager} •"
-  main_title "\033[3;40m${a10:-• UDP Custom Manager} •"
-  print_center -ama 'Version: ⇢ 3.0'
-  print_center -ama 'by InFiNitY'
+  main_title "\033[3;40m${a10:-• UDP REQUEST} •"
+  print_center -ama 'Release: v.5'
+  print_center -ama 'Resleeved Net'
   msg -bar
 
   # calculate RAM and CPU usage
@@ -852,19 +810,17 @@ menu_main() {
   cpu=$(top -bn1 | awk '/Cpu/ { cpu = "" 100 - $8 "%" }; END { print cpu }')
 
   # print system information
-  echo " $(msg -verd ' ⇢  IP:') $(msg -azu "$request_public_ip")  $(msg -verd 'Ram:') $(msg -azu "$ram") $(msg -verd 'CPU:') $(msg -azu "$cpu")"
+  echo " $(msg -verd ' ⇢ IP:') $(msg -azu "$request_public_ip")  $(msg -verd 'Ram:') $(msg -azu "$ram") $(msg -verd 'CPU:') $(msg -azu "$cpu")"
   msg -bar0
 
   # print options menu
-  print_center -ama "${a12:-CHOOSE UDP CORE}"
+  print_center -ama "${a12:-Resleeved Net UDP}"
   msg -bar3
-  echo " $(msg -verd "[1]") $(msg -verm2 '>') $(msg -verd "${a6:-UDP Custom}")"
-  # echo " $(msg -verd "[2]") $(msg -verm2 '>') $(msg -ama "${a8:-UDP Request}")"
+  echo " $(msg -verd "[1]") $(msg -verm2 '>') $(msg -verd "${a6:-UDP REQUEST}")"
   msg -bar3
-  echo " $(msg -verd "[3]") $(msg -verm2 '>') $(msg -teal "${a11:-Tweak UDP Speed $(msg -verm2 '[!Caution!]')}")"
-  echo " $(msg -verd "[4]") $(msg -verm2 '>') $(msg -teal "${a10:-VPS Info}")"
+  echo " $(msg -verd "[2]") $(msg -verm2 '>') $(msg -teal "${a10:-VPS Info}")"
   msg -bar3
-  echo " $(msg -verd "[10]") $(msg -verm2 '>') $(msg -verm2 "${a3:-Uninstall UDP Manager}")"
+  echo " $(msg -verd "[3]") $(msg -verm2 '>') $(msg -verm2 "${a3:-Uninstall UDP REQUEST}")"
   exit2home
 
   # prompt user for option selection
@@ -873,19 +829,13 @@ menu_main() {
   # handle option selection
   case $option in
   1)
-    menu_udp_custom
+    Menu_UDP_REQUEST
     ;;
-  # 2)
-  #   menu_udp_request
-  #   ;;
-  # 3)
-  #   tweak_udp_speed
-  #   ;;
-  4)
+  2)
     vps_info
     ;;
-  10)
-    uninstall_udp_manager
+  3)
+    Uninstall_UDP_REQUEST
     ;;
   0)
     exit
