@@ -537,13 +537,13 @@ new_user() {
   enter
 }
 
-Uninstall_UDP_REQUEST() {
-  title "${a32:-Uninstall UDP REQUEST}"
+Uninstall_UDP_CUSTOM() {
+  title "${a32:-Uninstall UDP CUSTOM}"
   read -rp " $(msg -ama "${a33:-Do you wish to continue? [Y/n]}:") " -e -i Y UNINS
   [[ $UNINS != @(Y|y|S|s) ]] && return
-  systemctl stop request-server.service &>/dev/null
-  systemctl disable request-server.service &>/dev/null
-  rm -rf /etc/systemd/system/request-server.service
+  systemctl stop custom-server.service &>/dev/null
+  systemctl disable custom-server.service &>/dev/null
+  rm -rf /etc/systemd/system/custom-server.service
   rm -rf /root/udp
   rm -rf /usr/bin/udp
   systemctl stop udpgw.service &>/dev/null
@@ -555,17 +555,17 @@ Uninstall_UDP_REQUEST() {
   exit
 }
 
-reset_udp_request() {
-  if [[ $(systemctl is-active request-server.service) = 'active' ]]; then
-    systemctl stop request-server.service &>/dev/null
-    systemctl disable request-server.service &>/dev/null
-    print_center -ama "${a35:-UDP REQUEST Reset Done!}"
+reset_udp_custom() {
+  if [[ $(systemctl is-active custom-server.service) = 'active' ]]; then
+    systemctl stop custom-server.service &>/dev/null
+    systemctl disable custom-server.service &>/dev/null
+    print_center -ama "${a35:-UDP CUSTOM Reset Done!}"
   else
-    systemctl start request-server.service &>/dev/null
-    if [[ $(systemctl is-active request-server.service) = 'active' ]]; then
-      systemctl enable request-server.service &>/dev/null
-      systemctl start request-server.service &>/dev/null
-      print_center -verd "${a36:-UDP REQUEST Running!}"
+    systemctl start custom-server.service &>/dev/null
+    if [[ $(systemctl is-active custom-server.service) = 'active' ]]; then
+      systemctl enable custom-server.service &>/dev/null
+      systemctl start custom-server.service &>/dev/null
+      print_center -verd "${a36:-UDP CUSTOM Running!}"
     else
       print_center -verm2 "${a37:-failed to start request-server.service!}"
     fi
@@ -575,7 +575,7 @@ reset_udp_request() {
 
 exclude() {
   title "${a20:-Exclude UDP ports}"
-  print_center -ama "${a21:-UDP REQUEST covers full range of ports,}"
+  print_center -ama "${a21:-UDP CUSTOM covers full range of ports,}"
   print_center -ama "${a22:-However, you can exclude UDP ports.}"
   msg -bar3
   print_center -ama "${a23:-Examples of ports you can exclude:}:"
@@ -611,7 +611,7 @@ exclude() {
 
 add_exclude() {
   title "${a20:-Exclude UDP ports}"
-  print_center -ama "${a21:-UDP REQUEST covers full range of ports,}"
+  print_center -ama "${a21:-UDP CUSTOM covers full range of ports,}"
   print_center -ama "${a22:-However, you can exclude UDP ports.}"
   msg -bar3
   print_center -ama "${a23:-Examples of ports you can exclude:}:"
